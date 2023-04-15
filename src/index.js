@@ -12,16 +12,16 @@ const listCountry = document.querySelector('.country-list');
 infoCountry.addEventListener('input', debounce(inputSearch, DEBOUNCE_DELAY));
 function inputSearch(evt) {
     evt.prevendDefault();
-    const name = evt.target.value.trim();
-    if (!name) {
+    const searchCountries = evt.target.value.trim();
+    if (!searchCountries) {
         listCountry.innerHTML = '';
         infoCountry.innerHTML = '';
         return;
     }
-    fetchCountries(name)
+    fetchCountries(searchCountries)
         .then(answer => {
             if (answer.length > 10) {
-                Notify.info(
+                Notiflix.Notify.info(
                     'Too many matches found. Please, enter a more specific name.'
                 );
                 return;
@@ -31,7 +31,7 @@ function inputSearch(evt) {
         .catch(error => {
       listCountry.innerHTML = '';
       infoCountry.innerHTML = '';
-      Notify.failure('Oops, there is no country with that name');
+      Notiflix.Notify.failure('Oops, there is no country with that name');
     });
     
 }
@@ -49,4 +49,44 @@ function renderedCountries(answer) {
     infoCountry.innerHTML = '';
     countriesListMarkup(answer);
   }
+}
+
+function countriesListMarkup(answer) {
+  const listMarkup = answer
+    .reduce((acc, { name, flags }) => { 
+    return acc + `<li>
+                  <img src="${flags.svg}" alt="${name}" width="100" height="auto">
+                  <span>${name.official}</span>
+              </li>`;
+    
+    }, '');
+  
+  listCountry.innerHTML = listMarkup;
+  return listMarkup;
+
+}
+
+function countryCardMarkup(answer) {
+  const cardMarkup = answer.reduce((acc, { flags, name, capital, population, languages, subregion, timezones }) => {
+    languages = Object.values(languages).join(', ');
+    let formattedPopulation = '';
+    if (population < 1000000) {
+      formattedPopulation = population.toLocaleString('en');
+    } else {
+      formattedPopulation = (population / 1000000).toLocaleString('en', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 3,
+      }) + ' million.';
+    }
+    return `
+            <img src="${flags.svg}" alt="${name}" width="640" height="auto">
+            <p> ${name.official}</p>
+            <p>Capital: <span> ${capital}</span></p>
+            <p>Population: <span> ${formattedPopulation} </span></p>
+            <p>Languages: <span> ${languages}</span></p>
+            <p>Subregion: <span> ${subregion}</span></p>
+            <p>Timezone: <span> ${timezones}</span></p>`;
+  }, '');
+  infoCountry.innerHTML = cardMarkup;
+  return cardMarkup;
 }
