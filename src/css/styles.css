@@ -18,3 +18,19 @@ body {
   max-width: 320px;
   margin-bottom: 16px;
 }
+
+ul,
+li,
+a {
+  list-style-type: none;;
+}
+
+p {
+  font-weight: bolder;
+  color: rgb(92, 92, 223);
+}
+
+span {
+  font-weight: bolder;
+  color: rgb(41, 32, 32);
+}

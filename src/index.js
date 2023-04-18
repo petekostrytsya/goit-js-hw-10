@@ -9,16 +9,18 @@ const inputCountry = document.querySelector('#search-box');
 const infoCountry = document.querySelector('.country-info');
 const listCountry = document.querySelector('.country-list');
 
-infoCountry.addEventListener('input', debounce(inputSearch, DEBOUNCE_DELAY));
+inputCountry.addEventListener('input', debounce(inputSearch, DEBOUNCE_DELAY));
 function inputSearch(evt) {
-    evt.prevendDefault();
+  evt.preventDefault();
+  console.log(evt);
     const searchCountries = evt.target.value.trim();
     if (!searchCountries) {
         listCountry.innerHTML = '';
         infoCountry.innerHTML = '';
         return;
     }
-    fetchCountries(searchCountries)
+
+  fetchCountries(searchCountries)
         .then(answer => {
             if (answer.length > 10) {
                 Notiflix.Notify.info(
@@ -67,25 +69,14 @@ function countriesListMarkup(answer) {
 }
 
 function countryCardMarkup(answer) {
-  const cardMarkup = answer.reduce((acc, { flags, name, capital, population, languages, subregion, timezones }) => {
+  const cardMarkup = answer.reduce((acc, { flags, name, capital, population, languages }) => {
     languages = Object.values(languages).join(', ');
-    let formattedPopulation = '';
-    if (population < 1000000) {
-      formattedPopulation = population.toLocaleString('en');
-    } else {
-      formattedPopulation = (population / 1000000).toLocaleString('en', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 3,
-      }) + ' million.';
-    }
     return `
-            <img src="${flags.svg}" alt="${name}" width="640" height="auto">
+            <img src="${flags.svg}" alt="${name}" width="520" height="auto">
             <p> ${name.official}</p>
             <p>Capital: <span> ${capital}</span></p>
-            <p>Population: <span> ${formattedPopulation} </span></p>
-            <p>Languages: <span> ${languages}</span></p>
-            <p>Subregion: <span> ${subregion}</span></p>
-            <p>Timezone: <span> ${timezones}</span></p>`;
+            <p>Population: <span> ${population} </span></p>
+            <p>Languages: <span> ${languages}</span></p>`;
   }, '');
   infoCountry.innerHTML = cardMarkup;
   return cardMarkup;
